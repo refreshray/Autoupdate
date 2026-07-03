@@ -1,10 +1,10 @@
 import requests
 
-# 1. ใส่ URL ของไฟล์ M3U ต้นทางบน GitHub (ต้องเป็นลิงก์แบบ Raw เท่านั้น)
-M3U_URL = "https://github.com/cattv976/iptv/raw/refs/heads/main/cattv.m3u"
+# 1. URL ต้นทางของคุณ
+M3U_URL = "https://github.com/cattv976/iptv/raw/refs/heads/main/cattv.m3u" # ตัวอย่างลิงก์ตามแท็บในภาพของคุณ
 
-# 2. ใส่ชื่อช่องที่คุณต้องการดึงมา (พิมพ์ให้ตรงหรือใกล้เคียงกับชื่อในไฟล์ต้นทาง)
-KEYWORDS = ["Cinemax", "CH7", "HBO", "Mono29","HBOFamily"] 
+# 2. ชื่อช่องที่ต้องการ (แนะนำให้ใช้พิมพ์ใหญ่-เล็กให้ตรง หรือใส่แค่คำสำคัญสั้นๆ)
+KEYWORDS = ["MONO29", "MonoPlus", "CH7", "HBO", "HBOHits", "HBOSignature", "HBOFamily", "Cinemax"]
 
 def main():
     response = requests.get(M3U_URL)
@@ -13,21 +13,35 @@ def main():
         return
 
     lines = response.text.splitlines()
-    output_lines = ["#EXTM3U\n"] # บรรทัดเริ่มต้นของไฟล์ M3U
+    output_lines = ["#EXTM3U\n"]
     
-    # วนลูปอ่านทีละบรรทัด
-    for i in range(len(lines)):
-        if lines[i].startswith("#EXTINF"):
-            # ตรวจสอบว่าบรรทัดนี้มีคำสำคัญที่เราต้องการไหม
-            if any(keyword.lower() in lines[i].lower() for keyword in KEYWORDS):
-                output_lines.append(lines[i] + "\n") # ใส่บรรทัด #EXTINF
-                if i + 1 < len(lines):
-                    output_lines.append(lines[i+1] + "\n") # ใส่บรรทัด URL ถัดมา
+    is_capturing = False # ตัวแปรเช็คว่าตอนนี้กำลังเก็บข้อมูลช่องที่เราต้องการอยู่ไหม
+
+    for line in lines:
+        # ตัดช่องว่างหัวท้ายออกเพื่อความแม่นยำ
+        clean_line = line.strip()
+        if not clean_line:
+            continue
+            
+        # ถ้าเจอขึ้นต้นด้วย #EXTINF ให้เช็คว่าใช่ช่องที่เราต้องการไหม
+        if clean_line.startswith("#EXTINF:"):
+            if any(keyword.lower() in clean_line.lower() for keyword in KEYWORDS):
+                is_capturing = True
+                output_lines.append(clean_line + "\n")
+            else:
+                is_capturing = False # ถ้าไม่ใช่ช่องที่เราต้องการ ก็หยุดเก็บข้อมูล
+                
+        # ถ้าอยู่ในระหว่างการเก็บข้อมูลช่องที่เราเลือก
+        elif is_capturing:
+            output_lines.append(clean_line + "\n")
+            # ถ้าเจอลิงก์สตรีมมิ่ง (มักขึ้นต้นด้วย http หรือ https) แปลว่าจบบล็อกของช่องนี้แล้ว
+            if clean_line.startswith("http://") or clean_line.startswith("https://"):
+                is_capturing = False # สั่งหยุดชั่วคราวเพื่อรอเจอ #EXTINF ช่องถัดไป
 
     # บันทึกเป็นไฟล์ใหม่
     with open("my_playlist.m3u", "w", encoding="utf-8") as f:
         f.writelines(output_lines)
-    print("กรองเพลย์ลิสต์เสร็จเรียบร้อยแล้ว!")
+    print("กรองเพลย์ลิสต์ระบบขั้นสูงเสร็จเรียบร้อยแล้ว!")
 
 if __name__ == "__main__":
     main()
