@@ -13,7 +13,7 @@ def main():
         return
 
     lines = response.text.splitlines()
-    output_lines = ["#EXTM3U\n"]
+    output_lines = ["#EXTM3U url-tvg=\"https://github.com/refreshray/epg-auto/raw/refs/heads/main/TV_epg.xml\"\n"]
     
     is_capturing = False # ตัวแปรเช็คว่าตอนนี้กำลังเก็บข้อมูลช่องที่เราต้องการอยู่ไหม
 
