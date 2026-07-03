@@ -1,0 +1,37 @@
+name: Update My M3U Playlist
+
+on:
+  schedule:
+    # รันอัตโนมัติทุกวัน เวลา 00:00 น. (เวลา UTC)
+    - cron: '0 0 * * *'
+  workflow_dispatch: # ปุ่มกดรันเองแบบ Manual
+
+jobs:
+  update-playlist:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # อนุญาตให้บอทเขียนไฟล์ลง Repo ได้
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: |
+        pip install requests
+
+    - name: Run script
+      run: python filter_m3u.py
+
+    - name: Commit and Push changes
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add my_playlist.m3u
+        git commit -m "Update playlist channels" || exit 0
+        git push
