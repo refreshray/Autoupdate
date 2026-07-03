@@ -39,7 +39,7 @@ def main():
                 is_capturing = False # สั่งหยุดชั่วคราวเพื่อรอเจอ #EXTINF ช่องถัดไป
 
     # บันทึกเป็นไฟล์ใหม่
-    with open("my_playlist.m3u", "w", encoding="utf-8") as f:
+    with open("๊Update_playlist.m3u", "w", encoding="utf-8") as f:
         f.writelines(output_lines)
     print("กรองเพลย์ลิสต์ระบบขั้นสูงเสร็จเรียบร้อยแล้ว!")
 
