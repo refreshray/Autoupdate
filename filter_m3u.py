@@ -4,7 +4,7 @@ import requests
 M3U_URL = "https://github.com/cattv976/iptv/raw/refs/heads/main/cattv.m3u" # ตัวอย่างลิงก์ตามแท็บในภาพของคุณ
 
 # 2. ชื่อช่องที่ต้องการ (แนะนำให้ใช้พิมพ์ใหญ่-เล็กให้ตรง หรือใส่แค่คำสำคัญสั้นๆ)
-KEYWORDS = ["MONO29", "MonoPlus", "CH7", "HBO", "HBOHits", "HBOSignature", "HBOFamily", "Cinemax"]
+KEYWORDS = ["ALTV","CH5","T-SPorts7"]
 
 def main():
     response = requests.get(M3U_URL)
