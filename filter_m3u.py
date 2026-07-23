@@ -1,24 +1,27 @@
 import requests
 
 # 1. URL ต้นทางของคุณ
-M3U_URL = "https://github.com/cattv976/iptv/raw/refs/heads/main/cattv.m3u" # ตัวอย่างลิงก์ตามแท็บในภาพของคุณ
+M3U_URL = "https://github.com/cattv976/iptv/raw/refs/heads/main/cattv.m3u"
 
-# 2. ชื่อช่องที่ต้องการ (แนะนำให้ใช้พิมพ์ใหญ่-เล็กให้ตรง หรือใส่แค่คำสำคัญสั้นๆ)
-KEYWORDS = ["ALTV","CH5","T-SPorts7"]
+# 2. ชื่อช่องที่ต้องการ (ระบบจะแปลงเป็นตัวพิมพ์เล็กให้อัตโนมัติอยู่แล้ว)
+KEYWORDS = ["ALTV", "CH5", "T-Sports7"]
 
 def main():
-    response = requests.get(M3U_URL)
-    if response.status_code != 200:
-        print("ไม่สามารถดาวน์โหลดไฟล์ต้นทางได้")
+    try:
+        response = requests.get(M3U_URL, timeout=10)
+        if response.status_code != 200:
+            print(f"ไม่สามารถดาวน์โหลดไฟล์ได้ (Status code: {response.status_code})")
+            return
+    except Exception as e:
+        print(f"เกิดข้อผิดพลาดในการเชื่อมต่อ: {e}")
         return
 
     lines = response.text.splitlines()
-    output_lines = ["#EXTM3U url-tvg=\"https://github.com/refreshray/epg-auto/raw/refs/heads/main/TV_epg.xml\"\n"]
+    output_lines = ['#EXTM3U url-tvg="https://github.com/refreshray/epg-auto/raw/refs/heads/main/TV_epg.xml"\n']
     
     is_capturing = False # ตัวแปรเช็คว่าตอนนี้กำลังเก็บข้อมูลช่องที่เราต้องการอยู่ไหม
 
     for line in lines:
-        # ตัดช่องว่างหัวท้ายออกเพื่อความแม่นยำ
         clean_line = line.strip()
         if not clean_line:
             continue
@@ -31,17 +34,19 @@ def main():
             else:
                 is_capturing = False # ถ้าไม่ใช่ช่องที่เราต้องการ ก็หยุดเก็บข้อมูล
                 
-        # ถ้าอยู่ในระหว่างการเก็บข้อมูลช่องที่เราเลือก
+        # ถ้าอยู่ในระหว่างการเก็บข้อมูลช่องที่เราเลือก (รวมถึงบรรทัด #EXTVLCOPT หรือ URL)
         elif is_capturing:
             output_lines.append(clean_line + "\n")
-            # ถ้าเจอลิงก์สตรีมมิ่ง (มักขึ้นต้นด้วย http หรือ https) แปลว่าจบบล็อกของช่องนี้แล้ว
+            # ถ้าเจอลิงก์สตรีมมิ่ง แปลว่าจบบล็อกของช่องนี้แล้ว
             if clean_line.startswith("http://") or clean_line.startswith("https://"):
-                is_capturing = False # สั่งหยุดชั่วคราวเพื่อรอเจอ #EXTINF ช่องถัดไป
+                is_capturing = False
 
-    # บันทึกเป็นไฟล์ใหม่
-    with open("๊Update_playlist.m3u", "w", encoding="utf-8") as f:
+    # บันทึกเป็นไฟล์ใหม่ (แก้ไขชื่อไฟล์ที่สะกดผิดแล้ว)
+    output_filename = "Update_playlist.m3u"
+    with open(output_filename, "w", encoding="utf-8") as f:
         f.writelines(output_lines)
-    print("กรองเพลย์ลิสต์ระบบขั้นสูงเสร็จเรียบร้อยแล้ว!")
+        
+    print(f"กรองเพลย์ลิสต์เสร็จเรียบร้อย! บันทึกลงไฟล์ {output_filename} แล้ว (พบทั้งหมด {len(output_lines)} บรรทัด)")
 
 if __name__ == "__main__":
     main()
