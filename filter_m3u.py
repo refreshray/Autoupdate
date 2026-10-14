@@ -4,7 +4,7 @@ import requests
 M3U_URL = "https://github.com/cattv976/iptv/raw/refs/heads/main/cattv.m3u"
 
 # 2. ชื่อช่องที่ต้องการ (ระบบจะแปลงเป็นตัวพิมพ์เล็กให้อัตโนมัติอยู่แล้ว)
-KEYWORDS = ["ALTV", "CH5", "T-Sports7","Samrujlok","MySci","Animal Show"]
+KEYWORDS = [,"Samrujlok","MySci","Animal Show""AsianHits","MonoPlus","HBO","HBOHits","HBOSignature","HBOFamily","Cinemax","Rock-Entertainment","ROCKAction","Warnertv","CARTOON NETWORK ","CARTOONITO ","NICKELODEON","NICK JR ","Boomerang","Boomerang CARTOON","Dreamworks","ANIMAX","Zoo Moo (1080p)","movies1","movies2","movies3","movies4","movies5","Food Network","Astro Grandstand","Astro Football ","Astro Premier League","Astro Premier League2"]
 
 def main():
     try:
